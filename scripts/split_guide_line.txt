@@ -1,0 +1,12 @@
+normal_txt_format
+
+class1-x1, y1, x2, y2-conf1/class2-x1, y1, x2, y2-conf2/...
+
+step1. split "/"
+step2. split "-"
+step3. split ", "
+
+결과
+=> (python list) [class, [x1, y1, x2, y2], conf], 딕셔너리로도 구현 가능.
+=> (array) class, [x1, y1, x2, y2], conf
+split된 결과를 토대로 변수로 넘겨야됨.
