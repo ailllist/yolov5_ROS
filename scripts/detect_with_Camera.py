@@ -27,6 +27,7 @@ Usage - formats:
 
 import argparse
 import imp
+from ntpath import join
 import os
 import sys
 from pathlib import Path
@@ -63,7 +64,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         line_thickness=3,  # bounding box thickness (pixels)
         hide_labels=False,  # hide labels
-        hide_conf=False,  # hide confidences
+        hide_conf=True,  # hide confidences
         ):
 
     # Load model
@@ -127,21 +128,25 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
+                save_txt = ""
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
                     label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
                     annotator.box_label(xyxy, label, color=colors(c, True))
+                    save_list = [str(i.tolist()) for i in xyxy]
+                    pre_txt = ", ".join(save_list)
+                    save_txt += f"{label}-{pre_txt}/"
+                # print(save_txt)
 
             # Stream results
             im0 = annotator.result()
         cv2.imshow("res", im0)
         # cv2.imwrite("res1.png", im0)
         cv2.waitKey(1)  # 1 millisecond
-
         # Print time (inference-only)
-        LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
-        print(1/(time.time()-s_time), time.time()-s_time)
+        # LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
+        # print(1/(time.time()-s_time), time.time()-s_time)
     # Print results
     t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
     LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}' % t)
