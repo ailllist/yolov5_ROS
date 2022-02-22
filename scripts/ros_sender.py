@@ -25,7 +25,6 @@ Usage - formats:
                                          yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
 """
 
-import imp
 import os
 import sys
 from pathlib import Path
