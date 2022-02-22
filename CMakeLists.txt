@@ -159,8 +159,8 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/ros_comuni.py
-  scripts/testing_send.py
+  scripts/ros_receiver.py
+  scripts/ros_sender.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
