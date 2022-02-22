@@ -25,17 +25,13 @@ Usage - formats:
                                          yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
 """
 
-import argparse
-from ast import AnnAssign
 import imp
 import os
 import sys
 from pathlib import Path
 
 import time
-import copy
 import cv2
-from numpy import rate
 import torch
 import torch.backends.cudnn as cudnn
 
@@ -49,10 +45,10 @@ if str(ROOT) not in sys.path:
 ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from models.common import DetectMultiBackend
-from utils.datasets import IMG_FORMATS, VID_FORMATS, LoadImages, LoadStreams
-from utils.general import (LOGGER, check_file, check_img_size, check_requirements, colorstr,
-                           increment_path, non_max_suppression, print_args, scale_coords, strip_optimizer, xyxy2xywh)
-from utils.plots import Annotator, colors, save_one_box
+from utils.datasets import IMG_FORMATS, VID_FORMATS, LoadStreams
+from utils.general import (LOGGER, check_img_size,
+                           non_max_suppression, scale_coords)
+from utils.plots import Annotator, colors
 from utils.torch_utils import select_device, time_sync
 
 IMGSZ = (640, 640)
@@ -94,9 +90,13 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
     pub = rospy.Publisher('classes', String, queue_size=10)
     rospy.init_node('yolov5_main', anonymous=True)
     rate = rospy.Rate(50)
-
+    
     while True:
-        s_time = time.time()
+
+        if rospy.is_shutdown():
+            cv2.destroyAllWindows()
+            break
+
         im, im0, vid_cap, s = dataset.return_info()
         t1 = time_sync()
         im = torch.from_numpy(im).to(device)
@@ -152,16 +152,12 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         cv2.imshow("res", im0)
         # cv2.imwrite("res1.png", im0)
         cv2.waitKey(1)  # 1 millisecond
-
         # Print time (inference-only)
         pub.publish(save_txt)
         rate.sleep()
 
         # LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
         # print(1/(time.time()-s_time), time.time()-s_time)
-    # Print results
-    t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
-    LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}' % t)
 
 if __name__ == "__main__":
     run()
