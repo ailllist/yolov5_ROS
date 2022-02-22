@@ -1,0 +1,6 @@
+<launch>
+    <group ns="main">
+        <node pkg="yolov5_ROS" type="testing_send.py" name="signal_sender"> </node>
+        <node pkg="yolov5_ROS" type="ros_comuni.py" name="signal_recever" output="screen"> </node>
+    </group>
+</launch>
