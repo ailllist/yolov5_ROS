@@ -6,3 +6,5 @@ scripts/yolov5/
 *.jpg
 
 *.pt
+
+scripts/.idea/
