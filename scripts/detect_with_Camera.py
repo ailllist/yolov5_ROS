@@ -52,19 +52,19 @@ from utils.general import (LOGGER, check_file, check_img_size, check_requirement
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, time_sync
 
-IMGSZ = (640, 640)
+IMGSZ = (640, 480)
 FPS = 90 # 0 -> as much as possable (default)
 
 @torch.no_grad()
 def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
-        conf_thres=0.25,  # confidence threshold
+        conf_thres=0.6,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         line_thickness=3,  # bounding box thickness (pixels)
         hide_labels=False,  # hide labels
-        hide_conf=True,  # hide confidences
+        hide_conf=False,  # hide confidences
         ):
 
     # Load model

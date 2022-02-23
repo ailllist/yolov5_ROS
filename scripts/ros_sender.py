@@ -50,7 +50,7 @@ from utils.general import (LOGGER, check_img_size,
 from utils.plots import Annotator, colors
 from utils.torch_utils import select_device, time_sync
 
-IMGSZ = (640, 640)
+IMGSZ = (640, 480) # make sure img ratio
 FPS = 90 # 0 -> as much as possable (default)
 
 @torch.no_grad()
