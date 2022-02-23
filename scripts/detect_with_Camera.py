@@ -25,9 +25,6 @@ Usage - formats:
                                          yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
 """
 
-import argparse
-import imp
-from ntpath import join
 import os
 import sys
 from pathlib import Path
@@ -40,6 +37,7 @@ import torch.backends.cudnn as cudnn
 import rospy
 
 FILE = Path(__file__).resolve()
+
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
