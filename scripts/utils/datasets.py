@@ -31,7 +31,8 @@ from utils.augmentations import Albumentations, augment_hsv, copy_paste, letterb
 from utils.general import (DATASETS_DIR, LOGGER, NUM_THREADS, check_dataset, check_requirements, check_yaml,
                            segments2boxes, xyn2xy, xywh2xyxy, xywhn2xyxy, xyxy2xywhn)
 from utils.torch_utils import torch_distributed_zero_first
-from utils.Camera_code import Camera
+# from utils.Camera_code import Camera
+from utils.useing_video import Camera
 
 # Parameters
 HELP_URL = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
