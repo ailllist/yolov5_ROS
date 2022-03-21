@@ -34,7 +34,6 @@ import copy
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
-import rospy
 
 FILE = Path(__file__).resolve()
 
