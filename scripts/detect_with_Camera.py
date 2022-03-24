@@ -144,7 +144,7 @@ def run(weights=ROOT / 'best_0321.pt',  # model.pt path(s)
             im0 = annotator.result()
         cv2.imshow("res", im0)
         # cv2.imwrite("res1.png", im0)
-        cv2.waitKey(1000)  # 1 millisecond
+        cv2.waitKey(1)  # 1 millisecond
         # Print time (inference-only)
         # LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
         # print(1/(time.time()-s_time), time.time()-s_time)
