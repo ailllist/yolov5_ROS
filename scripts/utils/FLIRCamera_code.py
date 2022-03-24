@@ -12,6 +12,10 @@ requirement:
 numpy
 opencv-python-4.x.x
 PySpin
+
+2022-03-24
+Tlqkf
+
 """
 
 IMG_WIDTH = 1920
@@ -23,40 +27,22 @@ SET_FPS = 13 # 0 = False(자동으로 FPS가 설정되게 한다.)
 class Camera: # 카메라에서 데이터를 불러들이는 부분. 되도록 건들이지 말것...
 
     def __init__(self):
-        self.img_list = []
-        try:
-            test_file = open('test.txt', 'w+')
-        except IOError:
-            print('Unable to write to current directory. Please check permissions.')
-            input('Press Enter to exit...')
-            return False
 
-        test_file.close()
-        os.remove(test_file.name)
-        t = time.strftime('%Y_%m_%d/%H_%M', time.localtime(time.time()))
-        path = "./save/%s" % t
-        if not os.path.isdir(path):
-            os.makedirs(path)
-        result = True
+        self.queue = Queue()
 
-        system = PySpin.System.GetInstance()
-        cam_list = system.GetCameras()
-        num_cameras = cam_list.GetSize()
+        M_P = Process(target=self.main)
+        M_P.start()
 
-        if num_cameras == 0:
-            cam_list.Clear()
-            system.ReleaseInstance()
-            return False
 
-        self.cam = cam_list[0]
+    def get_next_img(self) -> np.ndarray:
+        s_time = time.time()
+        while self.queue.empty(): # 만약 처리속도가 프레임속도보다 빠른 경우, 다음 이미지가 들어올때가지 기다린다.
+            pass
 
-        print('+++++++++++++++++++++++++++Running+++++++++++++++++++++++++++++++')
-        s_node_map = self.cam.GetTLStreamNodeMap()
-        handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
-        handling_mode_entry = PySpin.CEnumEntryPtr(handling_mode.GetCurrentEntry())
-        handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
-        handling_mode.SetIntValue(handling_mode_entry.GetValue())
-        result &= self.run_single_camera()
+        while self.queue.qsize() > 0: # 만약 이미지를 처리하다 큐가 밀리는 경우.
+            img = self.queue.get() # 이미지 처리하는 도중 쌓인 큐중 가장 최신 데이터가 나올때까지 데이터를 불러온다.
+        print("img_loader : ", time.time()-s_time)
+        return img
 
     def configure_custom_image_settings(self, nodemap):
         """
@@ -141,19 +127,7 @@ class Camera: # 카메라에서 데이터를 불러들이는 부분. 되도록 �
             return False
         return result
 
-    def get_next_img(self) -> np.ndarray:
-
-        image_result = self.cam.GetNextImage()  # 0.056 / 0.07
-        image_result.buffer = None  # almost 0.00001
-        image_converted = image_result.Convert(PySpin.PixelFormat_BGR8, PySpin.HQ_LINEAR)  # 0.003 / 0.07
-        img = image_converted.GetNDArray()  # 0.002 / 0.07
-        self.img_list.append(img)
-        image_result.Release()  # almost 0.00001
-
-        return img
-
-
-    def acquire_images(self, nodemap, nodemap_tldevice):
+    def acquire_images(self, cam, nodemap, nodemap_tldevice):
         """
         다음 이미지를 불러옴
         :param cam:
@@ -177,25 +151,90 @@ class Camera: # 카메라에서 데이터를 불러들이는 부분. 되도록 �
 
             acquisition_mode_continuous = node_acquisition_mode_continuous.GetValue()
             node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
+            cam.BeginAcquisition()
 
-            self.cam.BeginAcquisition()
+            cnt = 0
+            while True:
+                try:
+                    s_time = time.time()
+                    image_result = cam.GetNextImage() # 0.056 / 0.07
+                    image_result.buffer = None # almost 0.00001
+                    image_converted = image_result.Convert(PySpin.PixelFormat_BGR8, PySpin.HQ_LINEAR) # 0.003 / 0.07
+                    img = image_converted.GetNDArray() # 0.002 / 0.07
+                    self.queue.put(img)
+                    cnt += 1
+                    image_result.Release() # almost 0.00001
 
+                    # if cv2.waitKey(1) & 0xFF == 27:
+                    #     cv2.destroyAllWindows()
+                    #     break
+                    print("Camera : %f" % (1/(time.time()-s_time)))
+                except PySpin.SpinnakerException as ex:
+                    print('Error: %s' % ex)
+                    return False
+            cam.EndAcquisition()
 
         except PySpin.SpinnakerException as ex:
             print('Error: %s' % ex)
             return False
+        return result
 
-    def run_single_camera(self):
+
+    def run_single_camera(self, cam):
         try:
 
             result = True
-            nodemap_tldevice = self.cam.GetTLDeviceNodeMap()
-            self.cam.Init()
-            nodemap = self.cam.GetNodeMap()
+            nodemap_tldevice = cam.GetTLDeviceNodeMap()
+            cam.Init()
+            nodemap = cam.GetNodeMap()
             self.configure_custom_image_settings(nodemap)
-            result &= self.acquire_images(nodemap, nodemap_tldevice)
-            self.cam.DeInit()
+            result &= self.acquire_images(cam, nodemap, nodemap_tldevice)
+            cam.DeInit()
         except PySpin.SpinnakerException as ex:
             print('Error: %s' % ex)
             result = False
+        return result
+
+
+    def main(self):
+
+        try:
+            test_file = open('test.txt', 'w+')
+        except IOError:
+            print('Unable to write to current directory. Please check permissions.')
+            input('Press Enter to exit...')
+            return False
+
+        test_file.close()
+        os.remove(test_file.name)
+        t = time.strftime('%Y_%m_%d/%H_%M', time.localtime(time.time()))
+        path = "./save/%s" % t
+        if not os.path.isdir(path):
+            os.makedirs(path)
+        result = True
+
+        system = PySpin.System.GetInstance()
+        cam_list = system.GetCameras()
+        num_cameras = cam_list.GetSize()
+
+        if num_cameras == 0:
+            cam_list.Clear()
+            system.ReleaseInstance()
+            return False
+
+
+        for i, cam in enumerate(cam_list):
+            print('+++++++++++++++++++++++++++Running+++++++++++++++++++++++++++++++')
+            s_node_map = cam.GetTLStreamNodeMap()
+            handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
+            handling_mode_entry = PySpin.CEnumEntryPtr(handling_mode.GetCurrentEntry())
+            handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
+            handling_mode.SetIntValue(handling_mode_entry.GetValue())
+            result &= self.run_single_camera(cam)
+            print('---------------------------complete-------------------------------')
+        del cam
+        cam_list.Clear()
+        system.ReleaseInstance()
+        input('Done! Press Enter to exit...')
+
         return result
