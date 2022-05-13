@@ -51,14 +51,14 @@ from utils.torch_utils import select_device, time_sync
 
 # IMGSZ = (640, 480)
 IMGSZ = (1920, 1080)
-FPS = 90 # 0 -> as much as possable (default)
+FPS = 13 # 0 -> as much as possable (default)
 
 @torch.no_grad()
 # def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
-def run(weights=ROOT / 'best_0321.pt',  # model.pt path(s)
+def run(weights=ROOT / 'best.pt',  # model.pt path(s)
         # data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
-        conf_thres=0,  # confidence threshold
-        iou_thres=0,  # NMS IOU threshold
+        conf_thres=0.6,  # confidence threshold
+        iou_thres=0.5,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         line_thickness=3,  # bounding box thickness (pixels)
@@ -142,12 +142,14 @@ def run(weights=ROOT / 'best_0321.pt',  # model.pt path(s)
 
             # Stream results
             im0 = annotator.result()
+
         cv2.imshow("res", im0)
         # cv2.imwrite("res1.png", im0)
         cv2.waitKey(1)  # 1 millisecond
         # Print time (inference-only)
         # LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
-        # print(1/(time.time()-s_time), time.time()-s_time)
+        print(1/(time.time()-s_time), time.time()-s_time)
+
     # Print results
     t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
     LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}' % t)
