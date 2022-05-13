@@ -50,8 +50,9 @@ from utils.general import (LOGGER, check_img_size,
 from utils.plots import Annotator, colors
 from utils.torch_utils import select_device, time_sync
 
-IMGSZ = (640, 480) # make sure img ratio
-FPS = 90 # 0 -> as much as possable (default)
+# IMGSZ = (640, 480)
+IMGSZ = (1920, 1080)
+FPS = 13 # 0 -> as much as possable (default)
 
 @torch.no_grad()
 def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
@@ -67,7 +68,8 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
 
     # Load model
     device = select_device(device)
-    model = DetectMultiBackend(weights, device=device, dnn=False, data=data)
+    # model = DetectMultiBackend(weights, device=device, dnn=False, data=data)
+    model = DetectMultiBackend(weights, device=device, dnn=False)
     stride, names, pt, jit, onnx, engine = model.stride, model.names, model.pt, model.jit, model.onnx, model.engine
     imgsz = check_img_size(IMGSZ, s=stride)  # check image size
 
@@ -119,6 +121,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
 
         # Process predictions
+        save_txt = ""
         for i, det in enumerate(pred):  # per image
             seen += 1
             # s += f'{i}: '
