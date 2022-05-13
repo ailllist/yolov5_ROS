@@ -17,7 +17,7 @@ from pathlib import Path
 from threading import Thread
 from zipfile import ZipFile
 
-import pyrealsense2 as rs
+# import pyrealsense2 as rs
 import cv2
 import numpy as np
 import torch
@@ -32,8 +32,8 @@ from utils.general import (DATASETS_DIR, LOGGER, NUM_THREADS, check_dataset, che
                            segments2boxes, xyn2xy, xywh2xyxy, xywhn2xyxy, xyxy2xywhn)
 from utils.torch_utils import torch_distributed_zero_first
 # from utils.Camera_code import Camera
-# from utils.useing_video import Camera
-from utils.FLIRCamera_code import Camera
+from utils.useing_video import Camera
+# from utils.FLIRCamera_code import Camera
 
 # Parameters
 HELP_URL = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
