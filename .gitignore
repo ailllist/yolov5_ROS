@@ -9,6 +9,6 @@ scripts/yolov5/
 
 scripts/.idea/
 scripts/something_useful/
-scripts/utils/
+scripts/utils/__pycache__/
 .idea/
 
