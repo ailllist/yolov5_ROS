@@ -55,10 +55,10 @@ FPS = 13 # 0 -> as much as possable (default)
 
 @torch.no_grad()
 # def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
-def run(weights=ROOT / 'best.pt',  # model.pt path(s)
+def run(weights=ROOT / 'RTX_3090_0516.pt',  # model.pt path(s)
         # data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         conf_thres=0.6,  # confidence threshold
-        iou_thres=0.5,  # NMS IOU threshold
+        iou_thres=0.5,  # NMS IOU threshold;
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         line_thickness=3,  # bounding box thickness (pixels)
