@@ -12,3 +12,4 @@ scripts/something_useful/
 scripts/utils/__pycache__/
 .idea/
 
+scripts/test.py
