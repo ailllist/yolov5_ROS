@@ -4,8 +4,8 @@ scripts/yolov5/
 *.png
 *.jpeg
 *.jpg
-*.pt
 *.mp4
+*.pt
 
 scripts/.idea/
 scripts/something_useful/

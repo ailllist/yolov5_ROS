@@ -55,7 +55,9 @@ FPS = 13 # 0 -> as much as possable (default)
 
 @torch.no_grad()
 # def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
-def run(weights=ROOT / 'RTX_3090_0516.pt',  # model.pt path(s)
+# def run(weights=ROOT / 'RTX_3090_0516.pt',  # model.pt path(s)
+# def run(weights=ROOT / 'traffic_light.pt',  # model.pt path(s)
+def run(weights=ROOT / 'first_intg.pt',  # model.pt path(s)
         # data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         conf_thres=0.6,  # confidence threshold
         iou_thres=0.5,  # NMS IOU threshold;

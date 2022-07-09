@@ -46,3 +46,6 @@ class Camera:
         # Convert images to numpy arrays
         color_image = np.asanyarray(color_frame.get_data())
         return color_image
+
+if __name__ == "__main__":
+    Camera()
