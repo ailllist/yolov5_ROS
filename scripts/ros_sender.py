@@ -53,6 +53,36 @@ from utils.torch_utils import select_device, time_sync
 # IMGSZ = (640, 480)
 IMGSZ = (1920, 1080)
 FPS = 13 # 0 -> as much as possable (default)
+L_HOLD = False
+
+def l_holder(classes):
+
+    global L_HOLD
+    if "R" in classes or "O" in classes or "G" in classes: # check Traffic light in msg
+        if "L" in classes: # make L_hold
+            L_HOLD = True
+
+        if L_HOLD:
+            classes = classes.split("/")
+            global_str = ""
+            for i in classes:
+                tmp = i.split("-")
+                if tmp[0] in ["R", "G"]:
+                    tmp_str = "%s-%s-%s" % ("L"+tmp[0], tmp[1], tmp[2])
+                else:
+                    tmp_str = "-".join(tmp)
+                global_str += "/%s" % tmp_str
+            global_str = global_str[1:]
+
+        else:
+            global_str = classes
+            pass
+
+        return global_str
+
+    else:
+        L_HOLD = False
+        return classes
 
 @torch.no_grad()
 def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
@@ -155,6 +185,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         # cv2.imwrite("res1.png", im0)
         cv2.waitKey(1)  # 1 millisecond
         # Print time (inference-only)
+        save_txt = l_holder(save_txt)
         pub.publish(save_txt)
         rate.sleep()
 
